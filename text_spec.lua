@@ -6,24 +6,23 @@ local function shouldBeTable(t)
 	end
 end
 
+local function shouldBeLength(l, t)
+	local plural = l ~= 1 and "s" or ""
+	return string.format("should return %d line%s", l, plural), function()
+		assert.are.equal(l, #t)
+	end
+end
+
 describe("given nil", function()
 	local input = nil
 
-	it("should return empty table", function()
-		local actual = text.render(input)
-
-		assert.are.equal(0, #actual)
-	end)
+	it(shouldBeLength(0, text.render(input)))
 end)
 
 describe("given an empty string", function()
 	local input = ""
 
-	it("should return empty table", function()
-		local actual = text.render(input)
-
-		assert.are.equal(0, #actual)
-	end)
+	it(shouldBeLength(0, text.render(input)))
 end)
 
 describe("given text", function()
@@ -37,10 +36,7 @@ describe("given text", function()
 				local actual = text.render(input, length)
 
 				it(shouldBeTable(actual))
-
-				it("should return a single line", function()
-					assert.are.equal(1, #actual)
-				end)
+				it(shouldBeLength(1, actual))
 
 				it("should return element that matches the input", function()
 					assert.are.equal(input, actual[1])
@@ -55,10 +51,7 @@ describe("given text", function()
 				local actual = text.render(input, length)
 
 				it(shouldBeTable(actual))
-
-				it("should return two lines", function()
-					assert.are.equal(2, #actual)
-				end)
+				it(shouldBeLength(2, actual))
 
 				it("should return elements that match the input", function()
 					local first = "0123456789012345678901234"
@@ -66,6 +59,19 @@ describe("given text", function()
 
 					local second = "5678901234567890123456789"
 					assert.are.equal(second, actual[2])
+				end)
+			end)
+		end)
+
+		describe("without a max length", function()
+			describe("render", function()
+				local actual = text.render(input)
+
+				it(shouldBeTable(actual))
+				it(shouldBeLength(1, actual))
+
+				it("should return element that matches the input", function()
+					assert.are.equal(input, actual[1])
 				end)
 			end)
 		end)
@@ -81,13 +87,10 @@ describe("given text", function()
 				local actual = text.render(input, length)
 
 				it(shouldBeTable(actual))
-
-				it("should return a single line", function()
-				   assert.are.equal(1, #actual)
-				end)
+				it(shouldBeLength(1, actual))
 
 				it("should return element that matches the input", function()
-				   assert.are.equal(input, actual[1])
+					assert.are.equal(input, actual[1])
 				end)
 			end)
 		end)
@@ -99,20 +102,30 @@ describe("given text", function()
 				local actual = text.render(input, length)
 
 				it(shouldBeTable(actual))
-
-				it("should return three lines", function()
-				   assert.are.equal(3, #actual)
-				end)
+				it(shouldBeLength(3, actual))
 
 				it("should return elements that match the input", function()
-				   local first = "01234 56789 98765 43210"
-				   assert.are.equal(first, actual[1])
+					local first = "01234 56789 98765 43210"
+					assert.are.equal(first, actual[1])
 
-				   local second = "01234 56789 98765 43210"
-				   assert.are.equal(second, actual[2])
+					local second = "01234 56789 98765 43210"
+					assert.are.equal(second, actual[2])
 
-				   local third = "01"
-				   assert.are.equal(third, actual[3])
+					local third = "01"
+					assert.are.equal(third, actual[3])
+				end)
+			end)
+		end)
+
+		describe("without a max length", function()
+			describe("render", function()
+				local actual = text.render(input)
+
+				it(shouldBeTable(actual))
+				it(shouldBeLength(1, actual))
+
+				it("should return element that matches the input", function()
+					assert.are.equal(input, actual[1])
 				end)
 			end)
 		end)
@@ -128,17 +141,14 @@ describe("given text", function()
 				local actual = text.render(input, length)
 
 				it(shouldBeTable(actual))
-
-				it("should return two lines", function()
-				   assert.are.equal(2, #actual)
-				end)
+				it(shouldBeLength(2, actual))
 
 				it("should return elements that match the input", function()
-				   local first = "0123456789012345678901234"
-				   assert.are.equal(first, actual[1])
+					local first = "0123456789012345678901234"
+					assert.are.equal(first, actual[1])
 
-				   local second = "56789 01234 56789 012345"
-				   assert.are.equal(second, actual[2])
+					local second = "56789 01234 56789 012345"
+					assert.are.equal(second, actual[2])
 				end)
 			end)
 		end)
@@ -154,17 +164,14 @@ describe("given text", function()
 				local actual = text.render(input, length)
 
 				it(shouldBeTable(actual))
-
-				it("should return two lines", function()
-				   assert.are.equal(2, #actual)
-				end)
+				it(shouldBeLength(2, actual))
 
 				it("should return elements that match the input", function()
-				   local first = "56789 01234 56789 012345"
-				   assert.are.equal(first, actual[1])
+					local first = "56789 01234 56789 012345"
+					assert.are.equal(first, actual[1])
 
-				   local second = "0123456789012345678901234"
-				   assert.are.equal(second, actual[2])
+					local second = "0123456789012345678901234"
+					assert.are.equal(second, actual[2])
 				end)
 			end)
 		end)
@@ -180,20 +187,17 @@ describe("given text", function()
 				local actual = text.render(input, length)
 
 				it(shouldBeTable(actual))
-
-				it("should return three lines", function()
-				   assert.are.equal(3, #actual)
-				end)
+				it(shouldBeLength(3, actual))
 
 				it("should return elements that match the input", function()
-				   local first = "56789 01234"
-				   assert.are.equal(first, actual[1])
+					local first = "56789 01234"
+					assert.are.equal(first, actual[1])
 
-				   local second = "0123456789012345678901234"
-				   assert.are.equal(second, actual[2])
+					local second = "0123456789012345678901234"
+					assert.are.equal(second, actual[2])
 
-				   local third = "56789 012345"
-				   assert.are.equal(third, actual[3])
+					local third = "56789 012345"
+					assert.are.equal(third, actual[3])
 				end)
 			end)
 		end)
