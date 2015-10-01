@@ -13,16 +13,77 @@ local function shouldBeLength(l, t)
 	end
 end
 
-describe("given nil", function()
-	local input = nil
+-- for _ = 1, 100 do
+-- 	local chars = (function()
+-- 		local out = {}
+-- 		for i = 33, 126 do
+-- 			out[#out + 1] = string.char(i)
+-- 		end
 
-	it(shouldBeLength(0, text.render(input)))
-end)
+-- 		for _ = 1, 30 do
+-- 			out[#out + 1] = string.char(32) -- space
+-- 		end
+
+-- 		return out
+-- 	end)()
+
+-- 	describe("randomized testing", function()
+-- 		local max = math.random(100)
+-- 		local input = (function()
+-- 			local out = ""
+-- 			for _ = 1, max do
+-- 				local char = chars[math.random(#chars)]
+-- 				out = string.format("%s%s", out, char)
+-- 			end
+-- 			return out
+-- 		end)()
+
+-- 		describe("render", function()
+-- 			local length = math.random(max)
+-- 			local actual = text.render(input, length)
+
+-- 			it("should have some content?", function()
+-- 				print(string.format("\ninput (%d): %q", input:len(), input))
+-- 				print(string.format("actual (%d): ", length))
+-- 				for i, v in ipairs(actual) do
+-- 					print(string.format("  %02d: %q", i, v))
+-- 				end
+-- 			end)
+-- 		end)
+-- 	end)
+-- end
+
+--[[
+input (57): "Xt  6F GFo\"T.N @ ?shN C aV/  ,@Yy0pXk $ 6 gVLd>ak\"  - \\@Y"
+actual (49):
+  1: "Xt 6F GFo\"T.N @ ?shN C aV/ ,@Yy0pXk $ 6 gVLd>ak\""
+  2: "- \\@Y"
+]]
 
 describe("given an empty string", function()
 	local input = ""
 
-	it(shouldBeLength(0, text.render(input)))
+	describe("render", function()
+		local actual = text.render(input)
+
+		it(shouldBeLength(0, actual))
+	end)
+end)
+
+describe("given nil", function()
+	describe("render", function()
+		it("should error", function()
+		   assert.has_error(function() text.render() end, "invalid input, expected string")
+		end)
+	end)
+end)
+
+describe("given a non-string", function()
+	describe("render", function()
+		it("should error", function()
+		   assert.has_error(function() text.render({}) end, "invalid input, expected string")
+		end)
+	end)
 end)
 
 describe("given text", function()
@@ -149,6 +210,28 @@ describe("given text", function()
 
 					local second = "56789 01234 56789 012345"
 					assert.are.equal(second, actual[2])
+				end)
+			end)
+		end)
+
+		describe("and max length of 20", function()
+			local length = 20
+
+			describe("render", function()
+				local actual = text.render(input, length)
+
+				it(shouldBeTable(actual))
+				it(shouldBeLength(3, actual))
+
+				it("should elements that match the input", function()
+				   local first = "01234567890123456789"
+				   assert.are.equal(first, actual[1])
+
+				   local second = "01234 56789 01234"
+				   assert.are.equal(second, actual[2])
+
+				   local third = "56789 012345"
+				   assert.are.equal(third, actual[3])
 				end)
 			end)
 		end)

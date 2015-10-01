@@ -71,7 +71,8 @@ local function wrap(s, maxLength)
 end
 
 local function render(raw, maxLength)
-	if not raw or raw == "" then
+	assert(type(raw) == "string", "invalid input, expected string")
+	if raw == "" then
 		return {}
 	end
 
@@ -88,3 +89,4 @@ return {
 }
 
 -- TODO(Erik): local t = text("some string").align("right").render()
+-- TODO(Erik): Losing significant whitespace between words in a given line.
