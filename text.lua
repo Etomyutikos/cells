@@ -80,27 +80,70 @@ local function wrap(s, maxLength)
 	return out
 end
 
+local function getFormatFn(align, length)
+	if align == "left" then
+		return function()
+			return string.format("%%-%ds", length)
+		end
+	elseif align == "right" then
+		return function()
+			return string.format("%%%ds", length)
+		end
+	elseif align == "center" then
+		return function(line)
+			local space = length - line:len()
+			local left = math.floor(space / 2) + (space % 2)
+			local right = math.floor(space / 2)
+
+			return string.format("%s%%s%s", string.rep(" ", left), string.rep(" ", right))
+		end
+	end
+end
+
 local function text(raw)
 	assert(type(raw) == "string", "invalid input, expected string")
 	local T = {}
 
+  local align
 	local maxLength
 
-	function T.length(length)
-		assert(type(length) == "number", "invalid input, expected number")
-		maxLength = length
+	function T.align(a)
+		assert(type(a) == "string", "invalid input, expected left, right, or center")
+		local aligns = {
+			left = true,
+			right = true,
+			center = true,
+		}
+		assert(aligns[a], "invalid input, expected left, right, or center")
+
+		align = a
+
+		return T
+	end
+
+	function T.length(l)
+		assert(type(l) == "number", "invalid input, expected number")
+		maxLength = l
 
 		return T
 	end
 
 	function T.render()
-		return wrap(raw, maxLength)
+		local lines = wrap(raw, maxLength)
+
+		if not align or not maxLength then
+			return lines
+		end
+
+		local formatFn = getFormatFn(align, maxLength)
+		for i, v in ipairs(lines) do
+			lines[i] = string.format(formatFn(v), v)
+		end
+
+		return lines
 	end
 
 	return T
 end
 
 return text
-
--- TODO(Erik): local t = text("some string").align("right").render()
--- TODO(Erik): Losing significant whitespace between words in a given line.
