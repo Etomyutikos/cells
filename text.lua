@@ -1,4 +1,37 @@
--- http://lua-users.org/wiki/SplitJoin (string.gsplit)
+--- Module text returns a factory function for creating a text wrapper.
+-- The text wrapper provides a simple interface for wrapping and padding text
+-- within a given width.
+-- @module text
+
+--- getFormatFn returns a format string factory function.
+-- The function returned may take in an output line so it may construct the
+-- final format string.
+-- @treturn function
+local function getFormatFn(align, length)
+	if align == "left" then
+		return function()
+			return string.format("%%-%ds", length)
+		end
+	elseif align == "right" then
+		return function()
+			return string.format("%%%ds", length)
+		end
+	elseif align == "center" then
+		return function(line)
+			local space = length - line:len()
+			local left = math.floor(space / 2) + (space % 2)
+			local right = math.floor(space / 2)
+
+			return string.format("%s%%s%s", string.rep(" ", left), string.rep(" ", right))
+		end
+	end
+end
+
+--- gsplit returns an iterator that iterates over the words in a string.
+-- See: http://lua-users.org/wiki/SplitJoin (string.gsplit)
+-- @string s The string to be split.
+-- @string sep Word delimiter.
+-- @treturn function
 local function gsplit(s, sep, plain)
 	local start = 1
 	local done = false
@@ -19,7 +52,10 @@ local function gsplit(s, sep, plain)
 	end
 end
 
--- http://lua-users.org/wiki/StringTrim (trim6)
+--- trim removes whitespace from the beginning and end of a string.
+-- @string s The string to be trimmed.
+-- See: http://lua-users.org/wiki/StringTrim (trim6)
+-- @treturn string
 local function trim(s)
   return s:match'^()%s*$' and '' or s:match'^%s*(.*%S)'
 end
@@ -80,33 +116,20 @@ local function wrap(s, maxLength)
 	return out
 end
 
-local function getFormatFn(align, length)
-	if align == "left" then
-		return function()
-			return string.format("%%-%ds", length)
-		end
-	elseif align == "right" then
-		return function()
-			return string.format("%%%ds", length)
-		end
-	elseif align == "center" then
-		return function(line)
-			local space = length - line:len()
-			local left = math.floor(space / 2) + (space % 2)
-			local right = math.floor(space / 2)
-
-			return string.format("%s%%s%s", string.rep(" ", left), string.rep(" ", right))
-		end
-	end
-end
-
+--- text is a constructor for a text object.
+-- @string raw The string the text object wraps.
+-- @treturn text
 local function text(raw)
 	assert(type(raw) == "string", "invalid input, expected string")
+	-- @type text
 	local T = {}
 
   local align
-	local maxLength
+	local length
 
+	--- align sets padding within rendered output.
+	-- @string a Must be "left", "right", or "center".
+	-- @treturn text
 	function T.align(a)
 		assert(type(a) == "string", "invalid input, expected left, right, or center")
 		local aligns = {
@@ -121,21 +144,28 @@ local function text(raw)
 		return T
 	end
 
+	--- length sets maximum width for rendered output.
+	-- @number l
+	-- @treturn text
 	function T.length(l)
 		assert(type(l) == "number", "invalid input, expected number")
-		maxLength = l
+		length = l
 
 		return T
 	end
 
+	--- render processes the raw string and returns in formatted according to
+	-- length and align settings. Formatted text is returned as elements in a
+	-- table to ease user consumption.
+	-- @treturn table
 	function T.render()
-		local lines = wrap(raw, maxLength)
+		local lines = wrap(raw, length)
 
-		if not align or not maxLength then
+		if not align or not length then
 			return lines
 		end
 
-		local formatFn = getFormatFn(align, maxLength)
+		local formatFn = getFormatFn(align, length)
 		for i, v in ipairs(lines) do
 			lines[i] = string.format(formatFn(v), v)
 		end
