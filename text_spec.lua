@@ -1,106 +1,130 @@
 local text = require "text"
 
-describe("given nil", function()
-	describe("render", function()
+describe("text", function()
+	describe("given nil", function()
 		it("should error", function()
-			assert.has_error(function() text.render() end, "invalid input, expected string")
+			assert.has_error(function() text(nil) end, "invalid input, expected string")
 		end)
 	end)
-end)
 
-describe("given a non-string", function()
-	describe("render", function()
+	describe("given a non-string", function()
 		it("should error", function()
-			assert.has_error(function() text.render({}) end, "invalid input, expected string")
+			assert.has_error(function() text({}) end, "invalid input, expected string")
 		end)
 	end)
-end)
 
-local function testRender(input, length, expected)
-	describe(string.format("input %q of length %d", input, input:len()), function()
-		describe(string.format("and max length of %d", length or -1), function()
-			describe("render", function()
-				local actual = text.render(input, length)
-
-				it("should return elements matching the input", function()
-					assert.are.same(expected, actual)
-				end)
+	describe("length", function()
+		describe("given nil", function()
+			it("should error", function()
+			   assert.has_error(function() text("").length(nil) end, "invalid input, expected number")
 			end)
 		end)
+
+		describe("given a non-number", function()
+			it("should error", function()
+			   assert.has_error(function() text("").length("") end, "invalid input, expected number")
+			end)
+		end)
+
+		it("should return the text table", function()
+			local t = text("")
+			local actual = t.length(1)
+
+			assert.are.equal(t, actual)
+		end)
 	end)
-end
 
-describe("given an empty string", function()
-	testRender("", nil, {})
-end)
+	describe("render", function()
+ 		local function testRender(input, length, expected)
+			describe(string.format("input %q of length %d", input, input:len()), function()
+				local t = text(input)
 
-describe("given unspaced", function()
-	local input = "01234567890123456789012345678901234567890123456789"
+				describe(string.format("and max length of %s", length or "none"), function()
+					if length then
+						t.length(length)
+					end
 
-	testRender(input, 50, {
-		"01234567890123456789012345678901234567890123456789"
-	})
+					it("should return elements matching the input", function()
+						local actual = t.render()
+						assert.are.same(expected, actual)
+					end)
+				end)
+			end)
+		end
 
-	testRender(input, 25, {
-		"0123456789012345678901234",
-		"5678901234567890123456789"
-	})
+		describe("given an empty string", function()
+			testRender("", nil, {})
+		end)
 
-	testRender(input, nil, {
-		"01234567890123456789012345678901234567890123456789"
-	})
-end)
+		describe("given unspaced", function()
+			local input = "01234567890123456789012345678901234567890123456789"
 
-describe("given spaced", function()
-	local input = "01234 56789 98765 43210 01234 56789 98765 43210 01"
+			testRender(input, 50, {
+				"01234567890123456789012345678901234567890123456789"
+			})
 
-	testRender(input, 50, {
-		"01234 56789 98765 43210 01234 56789 98765 43210 01"
-	})
+			testRender(input, 25, {
+				"0123456789012345678901234",
+				"5678901234567890123456789"
+			})
 
-	testRender(input, 25, {
-		"01234 56789 98765 43210",
-		"01234 56789 98765 43210",
-		"01"
-	})
+			testRender(input, nil, {
+				"01234567890123456789012345678901234567890123456789"
+			})
+		end)
 
-	testRender(input, nil, {
-		"01234 56789 98765 43210 01234 56789 98765 43210 01"
-	})
-end)
+		describe("given spaced", function()
+			local input = "01234 56789 98765 43210 01234 56789 98765 43210 01"
 
-describe("given unspaced then spaced", function()
-	local input = "0123456789012345678901234 56789 01234 56789 012345"
+			testRender(input, 50, {
+				"01234 56789 98765 43210 01234 56789 98765 43210 01"
+			})
 
-	testRender(input, 25, {
-		"0123456789012345678901234",
-		"56789 01234 56789 012345"
-	})
+			testRender(input, 25, {
+				"01234 56789 98765 43210",
+				"01234 56789 98765 43210",
+				"01"
+			})
 
-	testRender(input, 20, {
-		"01234567890123456789",
-		"01234 56789 01234",
-		"56789 012345"
-	})
-end)
+			testRender(input, nil, {
+				"01234 56789 98765 43210 01234 56789 98765 43210 01"
+			})
+		end)
 
-describe("with spaced then unspaced", function()
-	local input = "56789 01234 56789 012345 0123456789012345678901234"
+		describe("given unspaced then spaced", function()
+			local input = "0123456789012345678901234 56789 01234 56789 012345"
 
-	testRender(input, 25, {
-		"56789 01234 56789 012345",
-		"0123456789012345678901234"
-	})
-end)
+			testRender(input, 25, {
+				"0123456789012345678901234",
+				"56789 01234 56789 012345"
+			})
 
-describe("with spaced between unspaced", function()
-	local input = "56789 01234 0123456789012345678901234 56789 012345"
+			testRender(input, 20, {
+				"01234567890123456789",
+				"01234 56789 01234",
+				"56789 012345"
+			})
+		end)
 
-	testRender(input, 25, {
-		"56789 01234",
-		"0123456789012345678901234",
-		"56789 012345"
-	})
+		describe("with spaced then unspaced", function()
+			local input = "56789 01234 56789 012345 0123456789012345678901234"
+
+			testRender(input, 25, {
+				"56789 01234 56789 012345",
+				"0123456789012345678901234"
+			})
+		end)
+
+		describe("with spaced between unspaced", function()
+			local input = "56789 01234 0123456789012345678901234 56789 012345"
+
+			testRender(input, 25, {
+				"56789 01234",
+				"0123456789012345678901234",
+				"56789 012345"
+			})
+		end)
+	end)
 end)
 
 -- for _ = 1, 100 do

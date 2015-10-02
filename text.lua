@@ -25,6 +25,16 @@ local function trim(s)
 end
 
 local function wrap(s, maxLength)
+	s = trim(s)
+
+	if s == "" then
+		return {}
+	end
+
+	if not maxLength or s:len() <= maxLength then
+		return {s}
+	end
+
 	local out = {}
 	local sub = ""
 
@@ -70,23 +80,27 @@ local function wrap(s, maxLength)
 	return out
 end
 
-local function render(raw, maxLength)
+local function text(raw)
 	assert(type(raw) == "string", "invalid input, expected string")
-	if raw == "" then
-		return {}
+	local T = {}
+
+	local maxLength
+
+	function T.length(length)
+		assert(type(length) == "number", "invalid input, expected number")
+		maxLength = length
+
+		return T
 	end
 
-	local s = trim(raw)
-	if not maxLength or s:len() <= maxLength then
-		return {s}
+	function T.render()
+		return wrap(raw, maxLength)
 	end
 
-	return wrap(s, maxLength)
+	return T
 end
 
-return {
-	render = render,
-}
+return text
 
 -- TODO(Erik): local t = text("some string").align("right").render()
 -- TODO(Erik): Losing significant whitespace between words in a given line.
