@@ -40,35 +40,14 @@ describe("text", function()
 		end)
 	end)
 
-	describe("length", function()
-		describe("given nil", function()
-			it("should error", function()
-				assert.has_error(function() text("").length(nil) end, "invalid input, expected number")
-			end)
-		end)
-
-		describe("given a non-number", function()
-			it("should error", function()
-				assert.has_error(function() text("").length("") end, "invalid input, expected number")
-			end)
-		end)
-
-		it("should return the text table", function()
-			local t = text("")
-			local actual = t.length(1)
-
-			assert.are.equal(t, actual)
-		end)
-	end)
-
 	describe("render", function()
- 		local function testRender(input, length, expected)
-			describe(string.format("input %q of length %d", input, input:len()), function()
+ 		local function testRender(input, width, expected)
+			describe(string.format("input %q of width %d", input, input:len()), function()
 				local t = text(input)
 
-				describe(string.format("and max length of %s", length or "none"), function()
-					if length then
-						t.length(length)
+				describe(string.format("and max width of %s", width or "none"), function()
+					if width then
+						t.width(width)
 					end
 
 					describe("without align", function()
@@ -323,6 +302,27 @@ describe("text", function()
 					"       56789 012345      "
 				}
 			})
+		end)
+	end)
+
+	describe("width", function()
+		describe("given nil", function()
+			it("should error", function()
+				assert.has_error(function() text("").width(nil) end, "invalid input, expected number")
+			end)
+		end)
+
+		describe("given a non-number", function()
+			it("should error", function()
+				assert.has_error(function() text("").width("") end, "invalid input, expected number")
+			end)
+		end)
+
+		it("should return the text table", function()
+			local t = text("")
+			local actual = t.width(1)
+
+			assert.are.equal(t, actual)
 		end)
 	end)
 end)

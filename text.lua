@@ -7,18 +7,18 @@
 -- The function returned may take in an output line so it may construct the
 -- final format string.
 -- @treturn function
-local function getFormatFn(align, length)
+local function getFormatFn(align, width)
 	if align == "left" then
 		return function()
-			return string.format("%%-%ds", length)
+			return string.format("%%-%ds", width)
 		end
 	elseif align == "right" then
 		return function()
-			return string.format("%%%ds", length)
+			return string.format("%%%ds", width)
 		end
 	elseif align == "center" then
 		return function(line)
-			local space = length - line:len()
+			local space = width - line:len()
 			local left = math.floor(space / 2) + (space % 2)
 			local right = math.floor(space / 2)
 
@@ -60,14 +60,14 @@ local function trim(s)
   return s:match'^()%s*$' and '' or s:match'^%s*(.*%S)'
 end
 
-local function wrap(s, maxLength)
+local function wrap(s, maxWidth)
 	s = trim(s)
 
 	if s == "" then
 		return {}
 	end
 
-	if not maxLength or s:len() <= maxLength then
+	if not maxWidth or s:len() <= maxWidth then
 		return {s}
 	end
 
@@ -85,11 +85,11 @@ local function wrap(s, maxLength)
 		local wlen = w:len()
 
 		-- we need to split the word
-		if wlen >= maxLength then
+		if wlen >= maxWidth then
 			-- may need to split multiple times
-			for i = 1, wlen - 1, maxLength do
-				local wsub = w:sub(i, i + maxLength - 1)
-				if wsub:len() == maxLength then
+			for i = 1, wlen - 1, maxWidth do
+				local wsub = w:sub(i, i + maxWidth - 1)
+				if wsub:len() == maxWidth then
 					-- if we had a line in progress, flush it
 					flush()
 
@@ -102,7 +102,7 @@ local function wrap(s, maxLength)
 		else
 			-- word may or may not fit the current line
 			local added = trim(string.format("%s %s", sub, w))
-			if added:len() <= maxLength then
+			if added:len() <= maxWidth then
 				-- fits
 				sub = added
 			else
@@ -125,7 +125,7 @@ local function text(raw)
 	local T = {}
 
   local align
-	local length
+	local width
 
 	--- align sets padding within rendered output.
 	-- @string a Must be "left", "right", or "center".
@@ -144,33 +144,33 @@ local function text(raw)
 		return T
 	end
 
-	--- length sets maximum width for rendered output.
-	-- @number l
-	-- @treturn text
-	function T.length(l)
-		assert(type(l) == "number", "invalid input, expected number")
-		length = l
-
-		return T
-	end
-
 	--- render processes the raw string and returns in formatted according to
-	-- length and align settings. Formatted text is returned as elements in a
+	-- width and align settings. Formatted text is returned as elements in a
 	-- table to ease user consumption.
 	-- @treturn table
 	function T.render()
-		local lines = wrap(raw, length)
+		local lines = wrap(raw, width)
 
-		if not align or not length then
+		if not align or not width then
 			return lines
 		end
 
-		local formatFn = getFormatFn(align, length)
+		local formatFn = getFormatFn(align, width)
 		for i, v in ipairs(lines) do
 			lines[i] = string.format(formatFn(v), v)
 		end
 
 		return lines
+	end
+
+	--- width sets maximum width for rendered output.
+	-- @number l
+	-- @treturn text
+	function T.width(w)
+		assert(type(w) == "number", "invalid input, expected number")
+		width = w
+
+		return T
 	end
 
 	return T
