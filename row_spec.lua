@@ -110,7 +110,7 @@ describe("row", function()
 				describe("given the long output first", function()
 					local r = row({tLong, tShort})
 
-					it("should return multiple lines with empty padding", function()
+					it("should return multiple lines with empty space", function()
 						local expected = {
 							"abcdefgvwxyz",
 							"hijklmn     ",
@@ -125,7 +125,7 @@ describe("row", function()
 				describe("given the long output second", function()
 					local r = row({tShort, tLong})
 
-					it("should return multiple lines with empty padding", function()
+					it("should return multiple lines with empty space", function()
 						local expected = {
 							"vwxyzabcdefg",
 							"     hijklmn",
@@ -150,7 +150,7 @@ describe("row", function()
 
 					local r = row({tLong, tUneven})
 
-					it("should return multiple lines with empty padding", function()
+					it("should return multiple lines with empty space", function()
 						local expected = {
 							"abcdefg123  ",
 							"hijklmn56789",
@@ -162,12 +162,6 @@ describe("row", function()
 					end)
 				end)
 			end)
-
-			pending("with margin", function() end)
-
-			pending("with border", function() end)
-
-			pending("with padding", function() end)
 		end)
 
 		describe("with width", function()
@@ -199,10 +193,10 @@ describe("row", function()
 					end)
 
 					it("should pad renderer's output", function()
-					   local expected = {"abcdefg   "}
-					   local actual = r.render()
+						local expected = {"abcdefg   "}
+						local actual = r.render()
 
-					   assert.are.same(expected, actual)
+						assert.are.same(expected, actual)
 					end)
 				end)
 
@@ -263,13 +257,13 @@ describe("row", function()
 					end)
 
 					it("should truncate renderers' outputs", function()
-					   local expected = {
-					   	"abchijopq",
-					   	"123      "
-					   }
-					   local actual = r.render()
+						local expected = {
+							"abchijopq",
+							"123      "
+						}
+						local actual = r.render()
 
-					   assert.are.same(expected, actual)
+						assert.are.same(expected, actual)
 					end)
 				end)
 
@@ -278,18 +272,18 @@ describe("row", function()
 					r.width(width)
 
 					it("should call renderers' width methods with partial width", function()
-				   	local expected = {4, 4, 3}
-				   	local actual = {0, 0, 0}
+					local expected = {4, 4, 3}
+					local actual = {0, 0, 0}
 
-				   	for i, v in ipairs({t1, t2, t3}) do
-				   		v.width = function(w)
-				   			actual[i] = w
-				   		end
-				   	end
+					for i, v in ipairs({t1, t2, t3}) do
+						v.width = function(w)
+							actual[i] = w
+						end
+					end
 
-				   	r.render()
+					r.render()
 
-				   	assert.are.same(expected, actual)
+					assert.are.same(expected, actual)
 					end)
 				end)
 
@@ -308,12 +302,6 @@ describe("row", function()
 					end)
 				end)
 			end)
-
-			pending("with margin", function() end)
-
-			pending("with border", function() end)
-
-			pending("with padding", function() end)
 		end)
 	end)
 

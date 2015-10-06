@@ -1,3 +1,11 @@
+--- Module row encapsulates renderers and returns their rendered contents laid
+-- out horizontally. Width can be specified, which will constain content width.
+-- @module row
+
+--- getWidestLine returns the widest line (highest len()) for a table of
+-- strings.
+-- @table t A table of strings.
+-- @treturn number
 local function getWidestLine(t)
 	local w = 0
 	for _, v in ipairs(t) do
@@ -9,6 +17,12 @@ local function getWidestLine(t)
 	return w
 end
 
+--- renderContents calls the render method on all content passed into the row
+-- constructor. Will calculate and constrain the width of inner content based
+-- on provided width and number of contents.
+-- @table contents A table of a table of strings.
+-- @number maxWidth
+-- @treturn A table of a table of formatted strings.
 local function renderContents(contents, maxWidth)
 	local width = (maxWidth and math.floor(maxWidth / #contents))
 	local rem = (width and maxWidth % width)
@@ -41,6 +55,10 @@ local function renderContents(contents, maxWidth)
 	return renders
 end
 
+--- row is a constructor for a row object.
+-- @table contents A table of objects satisfying an interface consisting of
+-- width() and render() methods.
+-- @treturn row
 local function row(contents)
 	assert(type(contents) == "table", "invalid input, expected table")
 	for i, v in ipairs(contents) do
@@ -50,10 +68,14 @@ local function row(contents)
 			string.format("invalid input, content %d has no width method", i))
 	end
 
+	--- @type row
 	local R = {}
 
 	local width
 
+	--- render processes internal contents and returns a table of formatted
+	-- strings.
+	-- @treturn table
 	function R.render()
 		if #contents == 0 then
 			return {}
@@ -94,6 +116,10 @@ local function row(contents)
 		return lines
 	end
 
+	--- width sets the width of the row, which will constrain all internal
+	-- content.
+	-- @number w
+	-- @treturn row
 	function R.width(w)
 		assert(type(w) == "number", "invalid input, expected number")
 		width = w

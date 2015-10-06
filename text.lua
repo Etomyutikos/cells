@@ -164,7 +164,7 @@ local function text(raw)
 	end
 
 	--- width sets maximum width for rendered output.
-	-- @number l
+	-- @number w
 	-- @treturn text
 	function T.width(w)
 		assert(type(w) == "number", "invalid input, expected number")
