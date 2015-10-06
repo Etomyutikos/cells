@@ -39,7 +39,13 @@ local function renderContents(contents, maxWidth)
 			c.width(w)
 		end
 
-		renders[i] = c.render()
+		local render = c.render()
+		assert(type(render) == "table", "invalid return from render, expected table of strings")
+		for _, v in ipairs(render) do
+			assert(type(v) == "string", "invalid return from render, expected table of strings")
+		end
+
+		renders[i] = render
 		if width then
 			for j, r in ipairs(renders[i]) do
 				if r:len() < width then

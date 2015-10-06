@@ -29,6 +29,35 @@ describe("column", function()
 	end)
 
 	describe("render", function()
+		describe("given renderer", function()
+			local t = {
+				render = function() end,
+				width = function() end,
+			}
+
+			local c = column({t})
+
+			describe("that doesn't return table", function()
+				t.render = function()
+					return ""
+				end
+
+				it("should error", function()
+				   assert.has_error(function() c.render() end, "invalid return from render, expected table of strings")
+				end)
+			end)
+
+			describe("that doesn't return table of strings", function()
+				t.render = function()
+					return {1, 2, 3}
+				end
+
+				it("should error", function()
+				   assert.has_error(function() c.render() end, "invalid return from render, expected table of strings")
+				end)
+			end)
+		end)
+
 		describe("without length", function()
 			describe("given an empty table", function()
 				local c = column({})

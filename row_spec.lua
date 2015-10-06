@@ -30,6 +30,35 @@ describe("row", function()
 	end)
 
 	describe("render", function()
+		describe("given renderer", function()
+			local t = {
+				render = function() end,
+				width = function() end,
+			}
+
+			local r = row({t})
+
+			describe("that doesn't return table", function()
+				t.render = function()
+					return ""
+				end
+
+				it("should error", function()
+				   assert.has_error(function() r.render() end, "invalid return from render, expected table of strings")
+				end)
+			end)
+
+			describe("that doesn't return table of strings", function()
+				t.render = function()
+					return {1, 2, 3}
+				end
+
+				it("should error", function()
+				   assert.has_error(function() r.render() end, "invalid return from render, expected table of strings")
+				end)
+			end)
+		end)
+
 		describe("without length", function()
 			describe("given an empty table", function()
 				local r = row({})
