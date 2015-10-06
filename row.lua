@@ -84,8 +84,8 @@ local function row(contents)
 		local lines = {}
 		do
 			local renders = renderContents(contents, width)
-			local i = 1
 
+			local i = 1
 			while true do
 				local misses = 0
 
