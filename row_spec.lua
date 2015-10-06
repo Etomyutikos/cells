@@ -163,19 +163,157 @@ describe("row", function()
 				end)
 			end)
 
-			pending("with margin")
+			pending("with margin", function() end)
 
-			pending("with border")
+			pending("with border", function() end)
 
-			pending("with padding")
+			pending("with padding", function() end)
 		end)
 
-		pending("with width", function()
-			pending("with margin")
+		describe("with width", function()
+			describe("given single renderer", function()
+				local t = {
+					render = function()
+						return {"abcdefg"}
+					end,
+					width = function() end
+				}
 
-			pending("with border")
+				local r = row({t})
 
-			pending("with padding")
+				describe("and width of 10", function()
+					local width = 10
+					r.width(width)
+
+					it("should call renderer's width method with full width", function()
+						local actual = false
+						t.width = function(w)
+							if w == width then
+								actual = true
+							end
+						end
+
+						r.render()
+
+						assert.is_true(actual)
+					end)
+
+					it("should pad renderer's output", function()
+					   local expected = {"abcdefg   "}
+					   local actual = r.render()
+
+					   assert.are.same(expected, actual)
+					end)
+				end)
+
+				describe("and width of 5", function()
+					local width = 5
+					r.width(width)
+
+					it("should truncate renderer's output", function()
+						local expected = {"abcde"}
+						local actual = r.render()
+
+						assert.are.same(expected, actual)
+					end)
+				end)
+			end)
+
+			describe("given multiple renderers", function()
+				local t1 = {
+					render = function()
+						return {
+							"abcdefg",
+							"1234567"
+						}
+					end,
+					width = function() end
+				}
+				local t2 = {
+					render = function()
+						return {"hijklmn"}
+					end,
+					width = function() end
+				}
+				local t3 = {
+					render = function()
+						return {"opqrstu"}
+					end,
+					width = function() end
+				}
+
+				local r = row({t1, t2, t3})
+
+				describe("and width of 9", function()
+					local width = 9
+					r.width(width)
+
+					it("should call renderers' width methods with partial width", function()
+						local expected = {3, 3, 3}
+						local actual = {0, 0, 0}
+						for i, v in ipairs({t1, t2, t3}) do
+							v.width = function(w)
+								actual[i] = w
+							end
+						end
+
+						r.render()
+
+						assert.are.same(expected, actual)
+					end)
+
+					it("should truncate renderers' outputs", function()
+					   local expected = {
+					   	"abchijopq",
+					   	"123      "
+					   }
+					   local actual = r.render()
+
+					   assert.are.same(expected, actual)
+					end)
+				end)
+
+				describe("and width of 11", function()
+					local width = 11
+					r.width(width)
+
+					it("should call renderers' width methods with partial width", function()
+				   	local expected = {4, 4, 3}
+				   	local actual = {0, 0, 0}
+
+				   	for i, v in ipairs({t1, t2, t3}) do
+				   		v.width = function(w)
+				   			actual[i] = w
+				   		end
+				   	end
+
+				   	r.render()
+
+				   	assert.are.same(expected, actual)
+					end)
+				end)
+
+				describe("and width of 24", function()
+					local width = 24
+					r.width(width)
+
+					it("should pad renderers' outputs", function()
+						local expected = {
+							"abcdefg hijklmn opqrstu ",
+							"1234567                 "
+						}
+						local actual = r.render()
+
+						assert.are.same(expected, actual)
+					end)
+				end)
+			end)
+
+			pending("with margin", function() end)
+
+			pending("with border", function() end)
+
+			pending("with padding", function() end)
 		end)
 	end)
 

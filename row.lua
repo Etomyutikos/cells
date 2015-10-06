@@ -9,9 +9,41 @@ local function getWidestLine(t)
 	return w
 end
 
-local function row(content)
-	assert(type(content) == "table", "invalid input, expected table")
-	for i, v in ipairs(content) do
+local function renderContents(contents, maxWidth)
+	local width = (maxWidth and math.floor(maxWidth / #contents))
+	local rem = (width and maxWidth % width)
+
+	local renders = {}
+	for i, c in ipairs(contents) do
+		if width then
+			local w = width
+			if rem > 0 then
+				w = w + 1
+				rem = rem - 1
+			end
+
+			c.width(w)
+		end
+
+		renders[i] = c.render()
+		if width then
+			for j, r in ipairs(renders[i]) do
+				if r:len() < width then
+					local fmt = string.format("%%-%ds", width)
+					renders[i][j] = string.format(fmt, r)
+				elseif r:len() > width then
+					renders[i][j] = r:sub(1, width)
+				end
+			end
+		end
+	end
+
+	return renders
+end
+
+local function row(contents)
+	assert(type(contents) == "table", "invalid input, expected table")
+	for i, v in ipairs(contents) do
 		assert(v.render and type(v.render) == "function",
 			string.format("invalid input, content %d has no render method", i))
 		assert(v.width and type(v.width) == "function",
@@ -23,34 +55,31 @@ local function row(content)
 	local width
 
 	function R.render()
-		if #content == 0 then
+		if #contents == 0 then
 			return {}
 		end
 
 		local lines = {}
 		do
-			local renders = {}
-			for i, v in ipairs(content) do
-				renders[i] = v.render()
-			end
-
-			local r = 1
+			local renders = renderContents(contents, width)
+			local i = 1
 
 			while true do
 				local misses = 0
-				for _, v in ipairs(renders) do
-					local lineWidth = getWidestLine(v)
 
-					if v[r] then
-						local format = string.format("%%-%ds", lineWidth)
-						lines[r] = string.format("%s%s", lines[r] or "", string.format(format, v[r]))
+				for _, r in ipairs(renders) do
+					local w = getWidestLine(r)
+
+					if r[i] then
+						local fmt = string.format("%%-%ds", w)
+						lines[i] = string.format("%s%s", lines[i] or "", string.format(fmt, r[i]))
 					else
-						lines[r] = string.format("%s%s", lines[r] or "", string.rep(" ", lineWidth))
+						lines[i] = string.format("%s%s", lines[i] or "", string.rep(" ", w))
 						misses = misses + 1
 					end
 				end
 
-				r = r + 1
+				i = i + 1
 
 				if misses == #renders then
 					break
