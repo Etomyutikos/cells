@@ -44,7 +44,7 @@ describe("row", function()
 				end
 
 				it("should error", function()
-				   assert.has_error(function() r.render() end, "invalid return from render, expected table of strings")
+					assert.has_error(function() r.render() end, "invalid return from render, expected table of strings")
 				end)
 			end)
 
@@ -54,7 +54,7 @@ describe("row", function()
 				end
 
 				it("should error", function()
-				   assert.has_error(function() r.render() end, "invalid return from render, expected table of strings")
+					assert.has_error(function() r.render() end, "invalid return from render, expected table of strings")
 				end)
 			end)
 		end)

@@ -43,7 +43,7 @@ describe("column", function()
 				end
 
 				it("should error", function()
-				   assert.has_error(function() c.render() end, "invalid return from render, expected table of strings")
+					assert.has_error(function() c.render() end, "invalid return from render, expected table of strings")
 				end)
 			end)
 
@@ -53,7 +53,7 @@ describe("column", function()
 				end
 
 				it("should error", function()
-				   assert.has_error(function() c.render() end, "invalid return from render, expected table of strings")
+					assert.has_error(function() c.render() end, "invalid return from render, expected table of strings")
 				end)
 			end)
 		end)

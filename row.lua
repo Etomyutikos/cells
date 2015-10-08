@@ -9,9 +9,7 @@
 local function getWidestLine(t)
 	local w = 0
 	for _, v in ipairs(t) do
-		if v:len() > w then
-			w = v:len()
-		end
+		w = math.max(v:len(), w)
 	end
 
 	return w
