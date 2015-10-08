@@ -1,3 +1,8 @@
+--- Module boxer wraps constructors that return renderers to provide CSS-like
+-- box model margin, border, and padding. boxer satisfies the renderer interface
+-- so it can be passed into other rows and columns.
+-- @module boxer
+
 --- getWidestLine returns the widest line (highest len()) for a table of
 -- strings.
 -- @table t A table of strings.
@@ -11,6 +16,12 @@ local function getWidestLine(t)
 	return w
 end
 
+--- wrap surrounds a table of strings in a given character. This includes a full
+-- bar of c as the first line and last elements of the returned table, as well
+-- as identical on each side of each line.
+-- @table t A table of strings.
+-- @string c The character to wrap the table with.
+-- @treturn table
 local function wrap(t, c)
 	local out = {}
 
@@ -33,6 +44,11 @@ local function wrap(t, c)
 	return out
 end
 
+--- boxer wraps a ctor for a renderer, adding functionality for rendering box
+-- model style margins, borders, and padding. boxer satisfies the renderer
+-- interface so it can be used a renderer in rows and columns.
+-- @function ctor The wrapped renderer constructor.
+-- @treturn boxer
 local function boxer(ctor)
 	assert(type(ctor) == "function", "invalid input, expected function")
 
@@ -43,12 +59,16 @@ local function boxer(ctor)
 		assert(renderer.width and type(renderer.width) == "function",
 			"invalid return from wrapped constructor, expected renderer")
 
+		--- @type boxer
 		local B = {}
 
 		local border
 		local margin
 		local padding
 
+		--- border sets the border string to be applied during render.
+		-- @string b
+		-- @treturn boxer
 		function B.border(b)
 			assert(type(b) == "string", "invalid input, expected string")
 			border = b
@@ -56,6 +76,9 @@ local function boxer(ctor)
 			return B
 		end
 
+		--- margin sets the margin string to be applied during render.
+		-- @string m
+		-- @treturn boxer
 		function B.margin(m)
 			assert(type(m) == "string", "invalid input, expected string")
 			margin = m
@@ -63,6 +86,9 @@ local function boxer(ctor)
 			return B
 		end
 
+		--- padding sets the padding string to be applied during render.
+		-- @string p
+		-- @treturn boxer
 		function B.padding(p)
 			assert(type(p) == "string", "invalid input, expected string")
 			padding = p
@@ -70,6 +96,9 @@ local function boxer(ctor)
 			return B
 		end
 
+		--- render wraps the output of the embedded renderer in strings as given by
+		-- the border, margin, and padding fields.
+		-- @treturn table
 		function B.render()
 			local r = renderer.render()
 
@@ -89,6 +118,11 @@ local function boxer(ctor)
 			return r
 		end
 
+		--- width calculates the width of the inner content based on the length of
+		-- the border, margin, and padding previously given. This width gets set as
+		-- the width of the wrapped renderer.
+		-- @number w
+		-- @treturn boxer
 		function B.width(w)
 			local mw = margin and margin:len() or 0
 			local bw = border and border:len() or 0

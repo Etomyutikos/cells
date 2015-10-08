@@ -121,7 +121,7 @@ end
 -- @treturn text
 local function text(raw)
 	assert(type(raw) == "string", "invalid input, expected string")
-	-- @type text
+	--- @type text
 	local T = {}
 
   local align
