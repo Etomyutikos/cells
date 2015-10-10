@@ -25,21 +25,31 @@ end
 local function wrap(t, c)
 	local out = {}
 
+	local tw = getWidestLine(t)
+	local cw = c:len()
+	local cm = 1
+	while cw < tw do
+		cw = string.rep(c, cm):len()
+		cm = cm + 1
+	end
+
 	for i, v in ipairs(t) do
 		local s = (function()
 			if c:len() == 1 then
 				return ""
 			end
 
-			return string.rep(" ", v:len() % 2)
+			-- TODO(Erik): width is lowest multiple of c >= v:len(). Add spaces until v == width.
+			-- EXCEPT, it can be done in here, because spaces need to be on innermost t.
+			-- return string.rep(" ", v:len() % 2)
+			return string.rep(" ", cw - v:len())
 		end)()
 
 		out[i] = string.format("%s%s%s%s", c, v, s, c)
 	end
 
-	local w = getWidestLine(out)
-	table.insert(out, 1, string.rep(c, w / c:len()))
-	out[#out+1] = string.rep(c, w / c:len())
+	table.insert(out, 1, string.rep(c, cm + 1))
+	out[#out+1] = string.rep(c, cm + 1)
 
 	return out
 end
@@ -71,6 +81,7 @@ local function boxer(ctor)
 		-- @treturn boxer
 		function B.border(b)
 			assert(type(b) == "string", "invalid input, expected string")
+			assert(b:len() == 1, "invalid input, expected single character")
 			border = b
 
 			return B
@@ -81,6 +92,7 @@ local function boxer(ctor)
 		-- @treturn boxer
 		function B.margin(m)
 			assert(type(m) == "string", "invalid input, expected string")
+			assert(m:len() == 1, "invalid input, expected single character")
 			margin = m
 
 			return B
@@ -91,6 +103,7 @@ local function boxer(ctor)
 		-- @treturn boxer
 		function B.padding(p)
 			assert(type(p) == "string", "invalid input, expected string")
+			assert(p:len() == 1, "invalid input, expected single character")
 			padding = p
 
 			return B
@@ -124,9 +137,9 @@ local function boxer(ctor)
 		-- @number w
 		-- @treturn boxer
 		function B.width(w)
-			local mw = margin and margin:len() or 0
-			local bw = border and border:len() or 0
-			local pw = padding and padding:len() or 0
+			local mw = margin and margin:len() * 2 or 0
+			local bw = border and border:len() * 2 or 0
+			local pw = padding and padding:len() * 2 or 0
 			w = w - (mw + bw + pw)
 			renderer.width(w)
 
