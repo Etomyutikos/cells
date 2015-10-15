@@ -11,10 +11,10 @@ local text = require "text"
 --- Table cells exposes the module interface.
 -- @table cells
 local cells = {
-	--- See @{column}
+	--- See @{column}, @{boxer}
 	column = boxer(column),
 
-	--- See @{row}
+	--- See @{row}, @{boxer}
 	row = boxer(row),
 
 	--- See @{text}.
