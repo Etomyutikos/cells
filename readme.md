@@ -108,7 +108,3 @@ Outputs:
 *                                                                              *
 ********************************************************************************
 ```
-
-# TODO
-* Improve error messages, so they return more useful user information, like stack traces or user script line numbers.
-* When setting `boxer` margin, border, and padding, width should be updated.
