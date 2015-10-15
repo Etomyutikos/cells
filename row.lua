@@ -27,8 +27,8 @@ local function renderContents(contents, maxWidth)
 
 	local renders = {}
 	for i, c in ipairs(contents) do
-		if width then
-			local w = width
+		local w = width
+		if w then
 			if rem > 0 then
 				w = w + 1
 				rem = rem - 1
@@ -44,13 +44,13 @@ local function renderContents(contents, maxWidth)
 		end
 
 		renders[i] = render
-		if width then
+		if w then
 			for j, r in ipairs(renders[i]) do
-				if r:len() < width then
-					local fmt = string.format("%%-%ds", width)
+				if r:len() < w then
+					local fmt = string.format("%%-%ds", w)
 					renders[i][j] = string.format(fmt, r)
-				elseif r:len() > width then
-					renders[i][j] = r:sub(1, width)
+				elseif r:len() > w then
+					renders[i][j] = r:sub(1, w)
 				end
 			end
 		end
@@ -112,6 +112,7 @@ local function row(contents)
 				end
 			end
 
+			-- remove final line if it's only spaces
 			if not lines[#lines]:find("%S") then
 				table.remove(lines, #lines)
 			end

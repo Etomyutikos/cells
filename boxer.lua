@@ -25,31 +25,18 @@ end
 local function wrap(t, c)
 	local out = {}
 
-	local tw = getWidestLine(t)
-	local cw = c:len()
-	local cm = 1
-	while cw < tw do
-		cw = string.rep(c, cm):len()
-		cm = cm + 1
+	do
+		local w = getWidestLine(t)
+		for i, v in ipairs(t) do
+			local s = w - v:len()
+
+			out[i] = string.format("%s%s%s%s", c, v, string.rep(" ", s), c)
+		end
 	end
 
-	for i, v in ipairs(t) do
-		local s = (function()
-			if c:len() == 1 then
-				return ""
-			end
-
-			-- TODO(Erik): width is lowest multiple of c >= v:len(). Add spaces until v == width.
-			-- EXCEPT, it can be done in here, because spaces need to be on innermost t.
-			-- return string.rep(" ", v:len() % 2)
-			return string.rep(" ", cw - v:len())
-		end)()
-
-		out[i] = string.format("%s%s%s%s", c, v, s, c)
-	end
-
-	table.insert(out, 1, string.rep(c, cm + 1))
-	out[#out+1] = string.rep(c, cm + 1)
+	local w = getWidestLine(out)
+	table.insert(out, 1, string.rep(c, w))
+	out[#out+1] = string.rep(c, w)
 
 	return out
 end
@@ -137,10 +124,13 @@ local function boxer(ctor)
 		-- @number w
 		-- @treturn boxer
 		function B.width(w)
-			local mw = margin and margin:len() * 2 or 0
-			local bw = border and border:len() * 2 or 0
-			local pw = padding and padding:len() * 2 or 0
+			local mw = margin and 2 or 0
+			local bw = border and 2 or 0
+			local pw = padding and 2 or 0
+
 			w = w - (mw + bw + pw)
+			assert(w > 0, "inner renderer width reduced to 0 or less")
+
 			renderer.width(w)
 
 			return B

@@ -258,6 +258,10 @@ describe("boxer", function()
 
 					assert.are.equal(expected, actual)
 				end)
+
+				it("should error when renderer width reduced to 0", function()
+					assert.has_error(function() b.width(2) end, "inner renderer width reduced to 0 or less")
+				end)
 			end)
 
 			describe("border", function()
@@ -274,6 +278,10 @@ describe("boxer", function()
 
 					assert.are.equal(expected, actual)
 				end)
+
+				it("should error when renderer width reduced to 0", function()
+					assert.has_error(function() b.width(2) end, "inner renderer width reduced to 0 or less")
+				end)
 			end)
 
 			describe("padding", function()
@@ -289,6 +297,10 @@ describe("boxer", function()
 					b.width(10)
 
 					assert.are.equal(expected, actual)
+				end)
+
+				it("should error when renderer width reduced to 0", function()
+					assert.has_error(function() b.width(2) end, "inner renderer width reduced to 0 or less")
 				end)
 			end)
 
@@ -308,6 +320,10 @@ describe("boxer", function()
 					b.width(10)
 
 					assert.are.equal(expected, actual)
+				end)
+
+				it("should error when renderer width reduced to 0", function()
+					assert.has_error(function() b.width(6) end, "inner renderer width reduced to 0 or less")
 				end)
 			end)
 		end)

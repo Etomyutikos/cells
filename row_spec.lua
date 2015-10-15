@@ -301,18 +301,18 @@ describe("row", function()
 					r.width(width)
 
 					it("should call renderers' width methods with partial width", function()
-					local expected = {4, 4, 3}
-					local actual = {0, 0, 0}
+						local expected = {4, 4, 3}
+						local actual = {0, 0, 0}
 
-					for i, v in ipairs({t1, t2, t3}) do
-						v.width = function(w)
-							actual[i] = w
+						for i, v in ipairs({t1, t2, t3}) do
+							v.width = function(w)
+								actual[i] = w
+							end
 						end
-					end
 
-					r.render()
+						r.render()
 
-					assert.are.same(expected, actual)
+						assert.are.same(expected, actual)
 					end)
 				end)
 
@@ -354,6 +354,82 @@ describe("row", function()
 			local actual = r.width(1)
 
 			assert.are.equal(r, actual)
+		end)
+	end)
+
+	describe("when the width is not evenly divisible by number of renderers", function()
+		local t1 = {
+			render = function()
+				return {
+				"this is some long",
+				"text this is some",
+				"long text this is",
+				"some long text   ",
+				"this is some long",
+				"text this is some",
+				"long text this is",
+				"some long text   ",
+				"this is some long",
+				"text this is some",
+				"long text this is",
+				"some long text   ",
+				"this is some long",
+				"text             ",
+				}
+			end,
+			width = function() end,
+		}
+
+		local t2 = {
+			render = function()
+				return {
+					"this is some    ",
+					"long text this  ",
+					"is some long    ",
+					"text this is    ",
+					"some long text  ",
+					"this is some    ",
+					"long text this  ",
+					"is some long    ",
+					"text this is    ",
+					"some long text  ",
+					"this is some    ",
+					"long text this  ",
+					"is some long    ",
+					"text this is    ",
+					"some long text  ",
+					"this is some    ",
+					"long text       ",
+				}
+			end,
+			width = function() end
+		}
+
+		local r = row({t1, t1, t2}).width(50)
+
+		it("then the output should be padded by distributed modulo", function()
+			local expected = {
+				"this is some longthis is some longthis is some    ",
+				"text this is sometext this is somelong text this  ",
+				"long text this islong text this isis some long    ",
+				"some long text   some long text   text this is    ",
+				"this is some longthis is some longsome long text  ",
+				"text this is sometext this is somethis is some    ",
+				"long text this islong text this islong text this  ",
+				"some long text   some long text   is some long    ",
+				"this is some longthis is some longtext this is    ",
+				"text this is sometext this is somesome long text  ",
+				"long text this islong text this isthis is some    ",
+				"some long text   some long text   long text this  ",
+				"this is some longthis is some longis some long    ",
+				"text             text             text this is    ",
+				"                                  some long text  ",
+				"                                  this is some    ",
+				"                                  long text       ",
+			}
+			local actual = r.render()
+
+			assert.are.same(expected, actual)
 		end)
 	end)
 end)
