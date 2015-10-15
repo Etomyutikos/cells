@@ -57,7 +57,7 @@ end
 -- See: http://lua-users.org/wiki/StringTrim (trim6)
 -- @treturn string
 local function trim(s)
-  return s:match'^()%s*$' and '' or s:match'^%s*(.*%S)'
+	return s:match'^()%s*$' and '' or s:match'^%s*(.*%S)'
 end
 
 local function wrap(s, maxWidth)
@@ -125,7 +125,7 @@ local function text(raw)
 	--- @type text
 	local T = {}
 
-  local align
+	local align
 	local width
 
 	--- align sets padding within rendered output.

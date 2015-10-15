@@ -41,7 +41,7 @@ describe("text", function()
 	end)
 
 	describe("render", function()
- 		local function testRender(input, width, expected)
+		local function testRender(input, width, expected)
 			describe(string.format("input %q of width %d", input, input:len()), function()
 				local t = text(input)
 
